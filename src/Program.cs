@@ -172,7 +172,7 @@ class Program
             Console.WriteLine($"{AsciiArt.Colors.Bright}{currentColor}{asciiArt[i]}{AsciiArt.Colors.Reset}");
         }
 
-        string[] winnerArt = GenerateAsciiArt("WE HAVE A WINNER");
+        string[] winnerArt = GenerateAsciiArt("WE HAVE A WINNER!");
         Console.WriteLine();
         for (int i = 0; i < winnerArt.Length; i++)
         {
