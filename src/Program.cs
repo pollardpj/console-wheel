@@ -41,6 +41,25 @@ class Program
         }
     }
 
+    // Add this method to shuffle the array
+    static void ShuffleStrings(string[] array)
+    {
+        using (var rng = RandomNumberGenerator.Create())
+        {
+            for (int i = array.Length - 1; i > 0; i--)
+            {
+                byte[] randomBytes = new byte[4];
+                rng.GetBytes(randomBytes);
+                int j = Math.Abs(BitConverter.ToInt32(randomBytes, 0)) % (i + 1);
+
+                // Swap
+                var temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+    }
+
     static void Main(string[] args)
     {
         // Enable ANSI color support for Windows
@@ -67,6 +86,42 @@ class Program
                                       .Where(s => !string.IsNullOrEmpty(s))
                                       .ToArray();
         
+        // Loop 5 times, reshuffling and increasing sleep each time
+        int initialSleep = 15;
+        int sleepIncrement = 50;
+        for (int loop = 0; loop < 3; loop++)
+        {
+            ShuffleStrings(stringList);
+
+            foreach (var s in stringList)
+            {
+                string[] asciiArtPreview = GenerateAsciiArt(s);
+                string[] colors = { AsciiArt.Colors.Red, AsciiArt.Colors.Yellow, AsciiArt.Colors.Green, AsciiArt.Colors.Cyan, AsciiArt.Colors.Blue, AsciiArt.Colors.Magenta };
+                int colorIndex = 0;
+                int previewFrames = 6;
+
+                for (int frame = 0; frame < previewFrames; frame++)
+                {
+                    Console.Clear();
+                    Console.SetCursorPosition(0, 0);
+                    Console.WriteLine($"{AsciiArt.Colors.Bright}{AsciiArt.Colors.Cyan}╔═══════════════════════════════════════════════════════╗{AsciiArt.Colors.Reset}");
+                    Console.WriteLine($"{AsciiArt.Colors.Bright}{AsciiArt.Colors.Cyan}║              CX Digital - Console Wheel               ║{AsciiArt.Colors.Reset}");
+                    Console.WriteLine($"{AsciiArt.Colors.Bright}{AsciiArt.Colors.Cyan}╚═══════════════════════════════════════════════════════╝{AsciiArt.Colors.Reset}");
+                    Console.WriteLine();
+
+                    for (int i = 0; i < asciiArtPreview.Length; i++)
+                    {
+                        string currentColor = colors[(colorIndex + i) % colors.Length];
+                        Console.WriteLine($"{AsciiArt.Colors.Bright}{currentColor}{asciiArtPreview[i]}{AsciiArt.Colors.Reset}");
+                    }
+
+                    colorIndex = (colorIndex + 1) % colors.Length;
+                    Thread.Sleep(100);
+                }
+                Thread.Sleep(initialSleep + loop * sleepIncrement); // Increase sleep each loop
+            }
+        }
+        
         // Get a random string from the list
         string selectedText = GetRandomString(stringList);
         
@@ -76,10 +131,10 @@ class Program
         // Generate ASCII art from selected text
         string[] asciiArt = GenerateAsciiArt(selectedText);
         
-        string[] colors = { AsciiArt.Colors.Red, AsciiArt.Colors.Yellow, AsciiArt.Colors.Green, AsciiArt.Colors.Cyan, AsciiArt.Colors.Blue, AsciiArt.Colors.Magenta };
+        string[] colorsFinal = { AsciiArt.Colors.Red, AsciiArt.Colors.Yellow, AsciiArt.Colors.Green, AsciiArt.Colors.Cyan, AsciiArt.Colors.Blue, AsciiArt.Colors.Magenta };
         
         // Animation loop
-        int colorIndex = 0;
+        int colorIndexFinal = 0;
         int animationFrames = 20;
         
         for (int frame = 0; frame < animationFrames; frame++)
@@ -96,11 +151,11 @@ class Program
             // Display the ASCII art with rainbow colors
             for (int i = 0; i < asciiArt.Length; i++)
             {
-                string currentColor = colors[(colorIndex + i) % colors.Length];
+                string currentColor = colorsFinal[(colorIndexFinal + i) % colorsFinal.Length];
                 Console.WriteLine($"{AsciiArt.Colors.Bright}{currentColor}{asciiArt[i]}{AsciiArt.Colors.Reset}");
             }
             
-            colorIndex = (colorIndex + 1) % colors.Length;
+            colorIndexFinal = (colorIndexFinal + 1) % colorsFinal.Length;
             Thread.Sleep(200);
         }
         
@@ -113,8 +168,16 @@ class Program
         
         for (int i = 0; i < asciiArt.Length; i++)
         {
-            string currentColor = colors[i % colors.Length];
+            string currentColor = colorsFinal[i % colorsFinal.Length];
             Console.WriteLine($"{AsciiArt.Colors.Bright}{currentColor}{asciiArt[i]}{AsciiArt.Colors.Reset}");
+        }
+
+        string[] winnerArt = GenerateAsciiArt("WE HAVE A WINNER");
+        Console.WriteLine();
+        for (int i = 0; i < winnerArt.Length; i++)
+        {
+            string winnerColor = colorsFinal[i % colorsFinal.Length];
+            Console.WriteLine($"{AsciiArt.Colors.Bright}{winnerColor}{winnerArt[i]}{AsciiArt.Colors.Reset}");
         }
         
         Console.WriteLine();
